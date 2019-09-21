@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/63dc04ec-6343-4949-bd3f-13911f31243c/resourceGroups/rg-poc-chatbot/providers/Microsoft.Web/sites/jetaicb",
+    "appService.deploySubpath": ""
+}
