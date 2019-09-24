@@ -27,7 +27,7 @@ class DateResolverDialog extends CancelAndHelpDialog {
         const timex = stepContext.options.date;
         
 
-        const promptMessageText = basicText.autoaskDate;
+        const promptMessageText = 'When do you want your auto insurance coverages to begin?';
         const promptMessage = MessageFactory.text(promptMessageText, promptMessageText, InputHints.ExpectingInput);
 
         const repromptMessageText = "I'm sorry, for best results, please enter the date in DD/MM/YYYY.";

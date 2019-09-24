@@ -8,20 +8,24 @@ const path = require('path');
 const restify = require('restify');
 var builder = require('botbuilder');  
 // Import required bot services. See https://aka.ms/bot-services to learn more about the different parts of a bot.
-const { BotFrameworkAdapter, MemoryStorage, ConversationState, UserState } = require('botbuilder');
+const { BotFrameworkAdapter, MemoryStorage, ConversationState, UserState, BrowserSessionStorage } = require('botbuilder');
 // This bot's main dialog.
 const { RichCardsBot } = require('./bots/richCardsBot');
-const { QnABot } = require('./bots/QnABot');
 const { MainDialog } = require('./dialogs/mainDialog');
 
 const ENV_FILE = path.join(__dirname, '.env');
-require('dotenv').config({ path: ENV_FILE });
+require('dotenv').config({ path: ENV_FILE }); 
+
 
 // Create adapter. See https://aka.ms/about-bot-adapter to learn more about adapters.
 const adapter = new BotFrameworkAdapter({
     appId: process.env.MicrosoftAppId,
     appPassword: process.env.MicrosoftAppPassword
-});
+}); 
+
+ 
+
+
 
 // Catch-all for errors.
 adapter.onTurnError = async (context, error) => {
@@ -54,47 +58,22 @@ const dialog = new MainDialog();
 const bot = new RichCardsBot(conversationState, userState, dialog);
 
 // Create HTTP server.
-const server = restify.createServer();
+const server = restify.createServer();  
+
+server.post({path: '/hello/:name'}, function(req, res, next) {
+    console.log(req.params);
+    res.send('<p>Olá</p>');
+});
+
+
+
+
 server.listen(process.env.port || process.env.PORT || 3978, function() {
     console.log(`\n${ server.name } listening to ${ server.url }.`);
     console.log(`\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator.`);
 }); 
 
  
-
- 
-
- bot.on('conversationUpdate', function (message) {
-    if (message.membersAdded && message.membersAdded.length > 0) {
-        // Say hello
-        var isGroup = message.address.conversation.isGroup;
-        var txt = isGroup ? "Hello everyone!" : "Hello...";
-        var reply = new builder.Message()
-                .address(message.address)
-                .text(txt);
-        bot.send(reply);
-    } else if (message.membersRemoved) {
-        // See if bot was removed
-        var botId = message.address.bot.id;
-        for (var i = 0; i < message.membersRemoved.length; i++) {
-            if (message.membersRemoved[i].id === botId) {
-                // Say goodbye
-                var reply = new builder.Message()
-                        .address(message.address)
-                        .text("Goodbye");
-                bot.send(reply);
-                break;
-            }
-        }
-    }
-});
- 
-
-
- 
- bot.on('event', function(message) { 
-    console.log('callled');
-}); 
 
 
 

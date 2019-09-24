@@ -1,8 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
-const { ActivityHandler,CardFactory } = require('botbuilder');
-const { QnAMaker,LuisRecognizer } = require('botbuilder-ai');
+const {
+    ActivityHandler,
+    CardFactory,
+    MessageFactory,
+    ActivityTypes
+} = require('botbuilder');
+const {
+    QnAMaker,
+    LuisRecognizer
+} = require('botbuilder-ai'); 
+const { getPolicy } = require("../functions"); 
+var axios = require('axios'); 
 /**
  * This IBot implementation can run any type of Dialog. The use of type parameterization is to allows multiple different bots
  * to be run at different endpoints within the same project. This can be achieved by defining distinct Controller types
@@ -27,22 +36,21 @@ class DialogBot extends ActivityHandler {
         this.conversationState = conversationState;
         this.userState = userState;
         this.dialog = dialog;
-        this.dialogState = this.conversationState.createProperty('DialogState');   
+        this.dialogState = this.conversationState.createProperty('DialogState');
 
-
-         const dispatchRecognizer = new LuisRecognizer({
+        const dispatchRecognizer = new LuisRecognizer({
             applicationId: process.env.LuisAppId,
             endpointKey: process.env.LuisAPIKey,
             endpoint: `https://${ process.env.LuisAPIHostName }`
         }, {
             includeAllIntents: true,
             includeInstanceData: true
-        }, true); 
+        }, true);
 
-        
+
         this.dispatchRecognizer = dispatchRecognizer;
 
-          try {
+        try {
             this.qnaMaker = new QnAMaker({
                 knowledgeBaseId: process.env.QnAKnowledgebaseId,
                 endpointKey: process.env.QnAEndpointKey,
@@ -55,109 +63,93 @@ class DialogBot extends ActivityHandler {
 
 
 
-
- this.onEvent(async (context, next) => {
-
-    await context.sendActivity("event received!");
-
-    await next();
-}); 
+        this.onTurn(async (context, next) => {
+              console.log('called');  
+              await next()
+        }); 
 
 
+        this.onUnrecognizedActivityType(async context => {
+  const { activity: { type } } = context;
+
+  if (type === ActivityTypes.Typing) {
+    await context.sendActivity({ type: ActivityTypes.Typing });
+  }
+});
+    
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        this.onMessage(async (context, next) => {    
-       console.log('onMessage called')   
-
-
-    // Save state changes
-    await this.userState.saveChanges(context);
-
-        
-       await context.sendActivity({ type: 'typing','delay':'1000'}); 
-
-
-       
-
-//Call LUIS 
-
-  // const recognizerResult = await dispatchRecognizer.recognize(context);
-
-  //           // Top intent tell us which cognitive service to use.
-  //           const intent = LuisRecognizer.topIntent(recognizerResult);
+        this.onMessage(async (context, next) => {
+            console.log('onMessage called') 
             
-  //           console.log(intent);
-  //           // Next, we call the dispatcher with the top intent.
-  //           await this.dispatchToTopIntentAsync(context, intent, recognizerResult);
 
 
-//end
+            // Save state changes
+            await this.userState.saveChanges(context);
+            // await context.sendActivity({ type: 'typing','delay':'1000'}); 
+            //Call LUIS 
+
+            // const recognizerResult = await dispatchRecognizer.recognize(context);
+
+            //           // Top intent tell us which cognitive service to use.
+            //           const intent = LuisRecognizer.topIntent(recognizerResult);
+
+            //           console.log(intent);
+            //           // Next, we call the dispatcher with the top intent.
+            //           await this.dispatchToTopIntentAsync(context, intent, recognizerResult);
 
 
+            //end
 
+            console.log(global.currentState);
+            if (global.currentState === 'FAQ') {
+                console.log('faq running');
+                if (!process.env.QnAKnowledgebaseId || !process.env.QnAEndpointKey || !process.env.QnAEndpointHostName) {
+                    let unconfiguredQnaMessage = 'NOTE: \r\n' +
+                        'QnA Maker is not configured. To enable all capabilities, add `QnAKnowledgebaseId`, `QnAEndpointKey` and `QnAEndpointHostName` to the .env file. \r\n' +
+                        'You may visit www.qnamaker.ai to create a QnA Maker knowledge base.'
 
-
-
-
- console.log(global.currentState);
-  if(global.currentState==='FAQ'){ 
-             console.log('faq running');
-        if (!process.env.QnAKnowledgebaseId || !process.env.QnAEndpointKey || !process.env.QnAEndpointHostName) {
-                let unconfiguredQnaMessage = 'NOTE: \r\n' + 
-                    'QnA Maker is not configured. To enable all capabilities, add `QnAKnowledgebaseId`, `QnAEndpointKey` and `QnAEndpointHostName` to the .env file. \r\n' +
-                    'You may visit www.qnamaker.ai to create a QnA Maker knowledge base.'
-
-                 await context.sendActivity(unconfiguredQnaMessage)
-            }
-            else {
-                console.log('Calling QnA Maker');
-    
-                const qnaResults = await this.qnaMaker.getAnswers(context);
-    
-                // If an answer was received from QnA Maker, send the answer back to the user.
-                if (qnaResults[0]) {
-                    await context.sendActivity(qnaResults[0].answer);
-    
-                // If no answers were returned from QnA Maker, reply with help.
+                    await context.sendActivity(unconfiguredQnaMessage)
                 } else {
-                    await context.sendActivity('Sorry, Im unable to answer. '); 
-                    global.currentState="CHOOSESERVICE";
-                 await dialog.run(context, conversationState.createProperty('DialogState'));
-                   
-                }
-    
-            }
-  }else{
-           console.log('run dialog ');
-            // Run the Dialog with the new message Activity.
-            await this.dialog.run(context, this.dialogState);
-  } 
+                    console.log('Calling QnA Maker');
 
- 
-         
+                    const qnaResults = await this.qnaMaker.getAnswers(context);
+
+                   
+
+                    if (qnaResults[0]) {
+                        var prompts = qnaResults[0].context.prompts;
+                        console.log(prompts.length);
+                        if (prompts == null || prompts.length <=0) { 
+                            console.log('if');
+                            await context.sendActivity(qnaResults[0].answer);
+                        } else { 
+                            console.log('else');
+                            await context.sendActivity(qnaResults[0].answer); 
+                            var outputActivity = showPrompts(prompts);
+                            await context.sendActivity(outputActivity)
+
+                        }
+                    } else {
+                        //console.log('no answer');
+                        await context.sendActivity('Sorry, Im unable to answer. ');
+                        global.currentState = "RESTART";
+                       await this.dialog.run(context, this.dialogState);
+
+                    }
+
+
+
+
+                }
+            }
+             else {
+                console.log('run dialog ');
+                // Run the Dialog with the new message Activity.
+                await this.dialog.run(context, this.dialogState);
+            }
+
+
 
 
             // By calling next() you ensure that the next BotHandler is run.
@@ -165,38 +157,41 @@ class DialogBot extends ActivityHandler {
         });
 
         this.onDialog(async (context, next) => { 
-            
+            console.log('onDialog'); 
+
+
             // Save any state changes. The load happened during the execution of the Dialog.
             await this.conversationState.saveChanges(context, false);
-            await this.userState.saveChanges(context, false);
+            await this.userState.saveChanges(context, false); 
+           
 
             // By calling next() you ensure that the next BotHandler is run.
             await next();
-        });
-    } 
+        }); 
+
+
+    }
 
 
 
 
-
-
-     async dispatchToTopIntentAsync(context, intent, recognizerResult) { 
+    async dispatchToTopIntentAsync(context, intent, recognizerResult) {
         console.log(recognizerResult.luisResult);
         switch (intent) {
-        case 'AUTO':
-            await this.processHomeAutomation(context, recognizerResult.luisResult);
-            break;
-        case 'l_Weather':
-            await this.processWeather(context, recognizerResult.luisResult);
-            break;
-        case 'q_sample-qna':
-            await this.processSampleQnA(context);
-            break;
-        default:
-            console.log(`Dispatch unrecognized intent: ${ intent }.`);
-            await context.sendActivity(`Dispatch unrecognized intent: ${ intent }.`);
-            // await next();
-            break;
+            case 'AUTO':
+                await this.processHomeAutomation(context, recognizerResult.luisResult);
+                break;
+            case 'l_Weather':
+                await this.processWeather(context, recognizerResult.luisResult);
+                break;
+            case 'q_sample-qna':
+                await this.processSampleQnA(context);
+                break;
+            default:
+                console.log(`Dispatch unrecognized intent: ${ intent }.`);
+                await context.sendActivity(`Dispatch unrecognized intent: ${ intent }.`);
+                // await next();
+                break;
         }
     }
 
@@ -243,6 +238,33 @@ class DialogBot extends ActivityHandler {
     }
 
 
+
+
 }
+
+
+
+
+function showPrompts(suggestionList) {
+    var cardActions = [];
+    suggestionList.forEach(element => {
+        cardActions.push({
+            value: element.displayText,
+            type: 'imBack',
+            title: element.displayText
+        });
+    });
+
+
+    var heroCard = CardFactory.heroCard(
+        '',
+        [],
+        CardFactory.actions(cardActions));
+
+    return {
+        attachments: [heroCard]
+    };
+}
+
 
 module.exports.DialogBot = DialogBot;

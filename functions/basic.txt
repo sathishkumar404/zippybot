@@ -1,0 +1,168 @@
+router.post("/insertEmployeeDetails", function (req, res) {
+    var query = "";
+    db.query(query,function(err,response){
+        if(err){
+            console.log(err.message);
+        }
+        else {
+            res.send({ status: 0, msg: "Success", data: response });
+
+        }
+    })
+})
+
+router.post("/listFavourite", async function (req, res) {
+	var query = "SELECT * FROM trn_user_favourites WHERE user_id = '" + req.body.userId + "' AND fav_status = 1 ";
+	db.query(query, function (err, response) {
+		if (err) {
+			console.log(err.message);
+			// res.send({ status: 0, msg: "Success", data: response});
+		} else {
+			//   res.send(response);
+			if (response.length == 0) {
+				res.send({ status: 0, msg: "No Realated Data", data: [] });
+				return
+			}
+			response.forEach(async (item, i) => {
+				var venueId = response[i].venue_id;
+				console.log(venueId);
+				response[i].availability = await availabilityData(venueId);
+				response[i].price = await price(venueId);
+				response[i].ameneties = await ameneties(venueId, res);
+				response[i].photos = await photos(venueId);
+
+				if (i == response.length - 1) {
+					res.send(response);
+				}
+
+			})
+		}
+	});
+})
+
+
+function availabilityData(venueId) {
+	return new Promise(resolve => {
+
+		var query = "SELECT * FROM `trn_venue_availability_details` WHERE trn_venue_id = '" + venueId + "'";
+		db.query(query, function (err, response) {
+			if (err) {
+				console.log(err.message);
+			} else {
+				resolve(response);
+			}
+		});
+	})
+}
+
+function price(venueId) {
+	return new Promise(resolve => {
+
+		var query = "SELECT * FROM `trn_venue_price_details` WHERE trn_venue_id = '" + venueId + "'";
+		db.query(query, function (err, response) {
+			if (err) {
+				console.log(err.message);
+			} else {
+				resolve(response);
+			}
+		});
+	})
+}
+
+function ameneties(venueId, res) {
+	return new Promise(resolve => {
+
+		var query = "SELECT mas_amenities.amenities_id,mas_amenities.amenities_name FROM `trn_venue_details` INNER JOIN trn_venue_amenities_details details ON details.trn_venue_id = trn_venue_details.venue_id INNER JOIN mas_amenities_details on mas_amenities_details.amenities_id = details.trn_venue_amnts_det_id INNER JOIN mas_amenities ON mas_amenities.amenities_id = mas_amenities_details.amenities_id  WHERE venue_id = '" + venueId + "' GROUP BY amenities_id"
+
+
+		db.query(query, function (err, response) {
+			if (err) {
+				console.log(err.message);
+			} else {
+				//   resolve(response);
+				response.forEach(async (item, i) => {
+					var amenitiesId = response[i].amenities_id;
+
+					response[i].amnDetails = await amenetiesDetails(amenitiesId, venueId);
+
+					setTimeout(function () {
+						console.log('timeout completed');
+					}, 1000);
+
+				});
+				resolve(response);
+			}
+		});
+	})
+}
+
+
+function amenetiesDetails(amenitiesId, venueId) {
+	return new Promise(resolve => {
+
+		var query = "SELECT amenities_det_id,amenities_det_name,trn_venue_amnts_det_datavalue1,trn_venue_amnts_det_datavalue2,trn_venue_amnts_det_datavalue3 FROM `mas_amenities_details` INNER JOIN trn_venue_amenities_details details ON details.trn_venue_amnts_id = mas_amenities_details.amenities_id  WHERE amenities_id = '" + amenitiesId + "' AND details.trn_venue_id = '" + venueId + "'";
+		db.query(query, function (err, response) {
+			if (err) {
+				console.log(err.message);
+			} else {
+				resolve(response);
+			}
+		});
+	})
+}
+
+
+function photos(venueId) {
+	return new Promise(resolve => {
+
+		var query = "SELECT * FROM `trn_venue_upload_photos` WHERE venue_id = '" + venueId + "'";
+		db.query(query, function (err, response) {
+			if (err) {
+				console.log(err.message);
+			} else {
+				for (i in response) {
+					var imgPath = response[i].venue_image_path
+					if (imgPath.search("http") == -1) {
+						var path = "http://52.90.88.67/ivnueuploads/";
+						response[i].venue_image_path = path.concat(response[i].venue_image_path)
+						// console.log(response[i].venue_image_path)
+					}
+					// console.log(imgPath);
+				}
+				// console.log(path.search("https"));
+				resolve(response);
+			}
+		});
+	})
+}
+
+
+
+router.post("/deleteDesignation", function (req, res) {
+    var query = "SELECT * FROM  `mas_employee` WHERE desigId = '" + req.body.desigId + "' ";
+    db.query(query, function (err, response) {
+        if (err) {
+            console.log(err.message);
+            res.send({ status: 1, msg: "Failed", data: [] });
+
+        }
+        else if (response.length > 0) {
+            res.send({ status: 0, msg: "Designation interlinked with employee details", data: [] });
+
+        } else {
+            var query = "DELETE FROM `mas_desig` WHERE  desigId = '" + req.body.desigId + "' ";
+            db.query(query, function (err, response) {
+                if (err) {
+                    console.log(err.message);
+                    res.send({ status: 1, msg: "Failed", data: [] });
+
+                }
+                else {
+                    res.send({ status: 0, msg: "Deleted", data: [] });
+
+                }
+
+            })
+        }
+    })
+})
