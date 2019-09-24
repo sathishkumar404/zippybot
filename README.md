@@ -61,7 +61,7 @@ Most channels support rich content.  In this sample we explore the different typ
 - Receipt Card
 - Sign In Card
 - Thumbnail Card
-- Video Card
+- Video CarD
 
 When [designing the user experience](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-design-user-experience?view=azure-bot-service-4.0#cards) developers should consider adding visual elements such as Rich Cards.
 
