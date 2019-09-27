@@ -22,9 +22,10 @@ const { basicText } = require("../resources/basicText");
 const CONFIRM_PROMPT = "confirmPrompt";
 const DATE_RESOLVER_DIALOG = "dateResolverDialog";
 const TEXT_PROMPT = "textPrompt";
-const WATERFALL_DIALOG = "waterfallDialog";
+const WATERFALL_DIALOG = "waterfallDialog"; 
+const EMAIL_PROMPT="emailPrompt";
 
-const { capitalize } = require("../functions");
+const { capitalize,emailValid } = require("../functions");
 
 class homeDialog extends CancelAndHelpDialog {
   constructor(id) {
@@ -33,6 +34,7 @@ class homeDialog extends CancelAndHelpDialog {
 
     this.addDialog(new TextPrompt(TEXT_PROMPT))
       .addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
+      .addDialog(new TextPrompt(EMAIL_PROMPT,emailValid))
       .addDialog(new DateResolverDialog(DATE_RESOLVER_DIALOG))
       .addDialog(
         new WaterfallDialog(WATERFALL_DIALOG, [
@@ -60,7 +62,6 @@ class homeDialog extends CancelAndHelpDialog {
 
 
     const bookingDetails = stepContext.options;
-    await stepContext.context.sendActivity(basicText.homeGreet1);
     await stepContext.context.sendActivity(basicText.homeGreet2);
     console.log("propertyType. step");
 
@@ -151,7 +152,6 @@ class homeDialog extends CancelAndHelpDialog {
   async confirmStep(stepContext) {
     const bookingDetails = stepContext.options;
 
-    await stepContext.context.sendActivity(basicText.livesGreet);
     // Capture the results of the previous step
     bookingDetails.homeLivesWithYou = stepContext.result.value;
     const messageText = basicText.fillClaim;
@@ -167,7 +167,9 @@ class homeDialog extends CancelAndHelpDialog {
 
   async getName(stepContext) {
     console.log(" name  step");
-    const bookingDetails = stepContext.options;
+    const bookingDetails = stepContext.options; 
+    
+    await stepContext.context.sendActivity(basicText.livesGreet);
 
     // Capture the response to the previous step's prompt
     bookingDetails.pastClaim = stepContext.result;
@@ -194,12 +196,9 @@ class homeDialog extends CancelAndHelpDialog {
 
     if (!bookingDetails.Email) {
       const messageText = basicText.askEmail;
-      const msg = MessageFactory.text(
-        messageText,
-        messageText,
-        InputHints.ExpectingInput
-      ); 
-      return await stepContext.prompt(TEXT_PROMPT, { prompt: msg });
+       const promptOptions = { prompt: basicText.askEmail, retryPrompt: basicText.retryEmailPrompt };
+ 
+      return await stepContext.prompt(EMAIL_PROMPT, promptOptions);
     }
 
     return await stepContext.next(bookingDetails.Email);

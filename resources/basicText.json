@@ -1,8 +1,8 @@
 {  
 	"basicText":{
-	"welcome1":"Hi there! I'm Lara Your Friendly Insurance Assistant",
+	"welcome1":"Hi there! I'm Andrea Your Friendly Insurance Assistant",
 	"welcome2":"I can help you find the right service you're looking for",
-	"chooseService":"But you need to tell me what brought you here first?",
+	"chooseService":"Here are some things I can help you, Make a selection",
 	"csOpt1":"Get a Quote",
 	"csOpt2":"Report a claim",
 	"csOpt3":"Ask a question",
@@ -10,10 +10,10 @@
 	"quoteGreet":"Got it!",
 	"quoteOption":"Got it! What you are looking to insure?",
 	"homeGreet1":"Sure, We'll help you understand and customize the right home insurance coverage for you",
-	"homeGreet2":"The best part is you can get a personalized home insurance for as little as $12/month",
+	"homeGreet2":"Great, our home insurance premiums starts as little as $12. Let me get you the right coverage's.",
 	"homeDateAsk":"Please let me know from when you would require this?",
-	"propertyType":"First up, whats your property type?",
-	"propertyLocation":"okay, To Start I'll will need your address",
+	"propertyType":"First up, What's your property type?",
+	"propertyLocation":"What is your property address?",
 	"coverageNeed":"What best describes your home?",
 	"askEmail":"Do you have a preferred email address to send this quote?",
 	"autoGreet":"Sure, I'm here to help you quickly and easily get car insurance that's right for you",
@@ -26,7 +26,7 @@
 	"home":"Home",
 	"auto":"Auto",
 	"c1":"Condo",
-	"c2":"Family House",
+	"c2":"Single F.H",
 	"c3":"Mobile Home",
 	"c4":"Town Home",
 	"residential":"Residential",
@@ -42,19 +42,19 @@
 	"policyNo":"Sure, I will need your policy number to start reporting",
 	"hi":"Hi Lara, happy to help.",
 	"ok":"Oh! Hope you are okay?",
-	"ss":"Plese enter security systems installed in your home ex camera, burglar alarm?",
+	"ss":"Tell me about the Home security that you've installed? \n \n  Ex: Surveillance Camera, Burglar Alarm, Subscription based security such as Ring, SimpliSafe etc.",
 	"supportsoon":"Thanks , our representative will reach to you as soon as possible.",
 	"dob":"Hi joe!! could you please confirm your date of birth?",
 	"incidentHappen":"Ok, when did this happen?",
 	"incidentDetail":"What is the Damage?",
 	"incidentImage":"ok, upload image of the car",
 	"incidentLocation":"Please give the location of accident",
-	"reload":"Do you have any other Queries?",
+	"reload":"Do you have any other Questions?",
 	"driving":"Since when you have been driving this?",
 	"havegreat2":"Have a great day!",
 	"balr":"Burglar Alarm",
 	"sc":"Security Camera",
-	"livesyou":"Sounds Great, Who lives with you?",
+	"livesyou":"Great. Who else is with you in the property?",
 	"jm":"Just Me",
 	"mp":"My Partner",
 	"pak":"Partner and Kids",
@@ -65,16 +65,70 @@
 	"livesGreet":"Great! Dryden got your back with your new policy",
 	"sysAlr":"Choose security system installed in your Home",
 	"fillClaim":"Have you filed any claims in the past 3 years?",
-	"name":"We're almost Done, can I know your name?",
+	"name":"We're almost Done, May I have your name?",
 	"prepare":"Give me a moment, Let me prepare a quick quote for you",
 	"autoEmail":"To which email would you like to send us the details to?",
 	"autoaskDate":"To get started, I would require date of insurance?",
-	"autoGreet2":"The best part is you can get a personalized car insurance for as little as $15/month",
+	"autoGreet2":"Great, our Auto insurance premiums starts as little as $12. Let me get you the right coverage.",
 	"homeThanks":"Have a great day! welcome back and happy to help.",
 	"havegreat1":"Thanks ! We have sent the details to you email and I will have my account manager connect to you ASAP.",
 	"test":"test",
-		"test1":"test",
-	"autofinal":"Well that's a great choice , we will have this quote sent to your email and if you would like to followup with our manager , please drop your contact no. \n \n We will never share your contact number outside of our line of business."
+		"test1":"test", 
+		"retryEmailPrompt":"Email Id Invalid",
+	"autofinal":"Well that's a great choice , we will have this quote sent to your email and if you would like to followup with our manager , please drop your contact no. \n \n We will never share your contact number outside of our line of business.",
+	"Recommended": [
+                {
+                    "title": "Uninsured / Under-insured Motorist Insurance",
+                    "price": "$10"
+                },
+                {
+                    "title": "Comprehensive Insurance Loan",
+                    "price": "$10"
+                },
+                {
+                    "title": "Miscellaneous Extra Insurance",
+                    "price": "$19"
+                },
+                {
+                    "title": "Total (Includes Basic+)",
+                    "price": "$69"
+                }
+      ],
+	"Classic":[
+                {
+                    "title": "PIP Medical Expenses Insurance",
+                    "price": "$10"
+                },
+                {
+                    "title": "Catastrophic Medical Insurance Policy",
+                    "price": "$17"
+                },
+                {
+                    "title": "Total (Includes Basic+)",
+                    "price": "$47"
+                }
+            ],
+	"Basic":[
+                {
+                    "title": "Collision Insurance",
+                    "price": "$10"
+                },
+                {
+                    "title": "Liability insurance",
+                    "price": "$15"
+                },
+                {
+                    "title": "No-Fault Insurance and PIP",
+                    "price": "$10"
+                },
+                {
+                    "title": "Total",
+                    "price": "$35"
+                }
+            ]
+
 	}
+
+	
 	
 }

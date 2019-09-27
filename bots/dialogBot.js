@@ -63,10 +63,11 @@ class DialogBot extends ActivityHandler {
 
 
 
-        this.onTurn(async (context, next) => {
-              console.log('called');  
-              await next()
-        }); 
+        // this.onTurn(async (context, next) => {
+        //       console.log('called');    
+        //       await context.sendActivity({ type: 'typing','delay':'3000'});  
+        //       await next()
+        // }); 
 
 
         this.onUnrecognizedActivityType(async context => {

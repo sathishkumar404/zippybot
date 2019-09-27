@@ -75,7 +75,7 @@ class MainDialog extends ComponentDialog {
       
     await stepContext.context.sendActivity(basicText.reach);
       console.log('in');
- const messageText = 'Do you have any other Queries?';  
+ const messageText = 'Do you have any other Questions?';  
   const msg = MessageFactory.text(
       messageText,
       messageText,
