@@ -19,7 +19,7 @@ const {
 } = require("botbuilder-dialogs");
 const { CancelAndHelpDialog } = require("./cancelAndHelpDialog");
 const { DateResolverDialog } = require("./dateResolverDialog");
-
+const { confirmHome } = require("./confirmHome");
 const { capitalize,emailValid } = require("../functions");
 
 const { basicText } = require("../resources/basicText");

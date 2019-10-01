@@ -25,7 +25,9 @@ const { autoDialog } = require("./autoDialog");
 
 const { claimDialog } = require("./claimDialog");
 
-const { faqDialog } = require("./faqDialog"); 
+const { faqDialog } = require("./faqDialog");  
+
+// const { ConfirmAuto } = require("./confirmAuto"); 
 
 
 const { capitalize } = require("../functions");
@@ -37,12 +39,13 @@ const MAIN_WATERFALL_DIALOG = "mainWaterfallDialog";
 class MainDialog extends ComponentDialog {
   constructor() {
     super("MainDialog");
-
+   console.log('main dialog');
     // Define the main dialog and its related components.
     this.addDialog(new ChoicePrompt("cardPrompt"));
     this.addDialog(new homeDialog("homeDialog"));
     this.addDialog(new autoDialog("autoDialog"));
     this.addDialog(new faqDialog("faqDialog"));
+    // this.addDialog(new ConfirmAuto("confirmAuto"));
     this.addDialog(new claimDialog("claimDialog"));
     this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
     this.addDialog(

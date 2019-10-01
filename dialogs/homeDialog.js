@@ -17,14 +17,14 @@ const {
 } = require("botbuilder-dialogs");
 const { CancelAndHelpDialog } = require("./cancelAndHelpDialog");
 const { DateResolverDialog } = require("./dateResolverDialog");
-
+const { ConfirmClaim } = require("./confirmClaim");
 const { basicText } = require("../resources/basicText");
 const CONFIRM_PROMPT = "confirmPrompt";
 const DATE_RESOLVER_DIALOG = "dateResolverDialog";
 const TEXT_PROMPT = "textPrompt";
 const WATERFALL_DIALOG = "waterfallDialog"; 
 const EMAIL_PROMPT="emailPrompt";
-
+const CONFIRM_CLAIM="confirmClaim";
 const { capitalize,emailValid } = require("../functions");
 
 class homeDialog extends CancelAndHelpDialog {
@@ -36,6 +36,7 @@ class homeDialog extends CancelAndHelpDialog {
       .addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
       .addDialog(new TextPrompt(EMAIL_PROMPT,emailValid))
       .addDialog(new DateResolverDialog(DATE_RESOLVER_DIALOG))
+      .addDialog(new ConfirmClaim(CONFIRM_CLAIM))
       .addDialog(
         new WaterfallDialog(WATERFALL_DIALOG, [
           this.propertyType.bind(this),
@@ -58,7 +59,6 @@ class homeDialog extends CancelAndHelpDialog {
    * If a destination city has not been provided, prompt for one.
    */
   async propertyType(stepContext) {  
-
 
 
     const bookingDetails = stepContext.options;
