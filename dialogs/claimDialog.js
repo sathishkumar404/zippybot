@@ -21,6 +21,9 @@ const CONFIRM_PROMPT = "confirmPrompt";
 const DATE_RESOLVER_DIALOG = "dateResolverDialog";
 const TEXT_PROMPT = "textPrompt";
 const ATTACHMENT_PROMPT = "attachmentprompt";
+const DATE_PROMPT ='datePrompt'
+
+const { validDate } = require("../functions");
 const WATERFALL_DIALOG = "waterfallDialog";
 
 class claimDialog extends CancelAndHelpDialog {
@@ -31,6 +34,7 @@ class claimDialog extends CancelAndHelpDialog {
     this.addDialog(new TextPrompt(TEXT_PROMPT))
       .addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
       .addDialog(new AttachmentPrompt(ATTACHMENT_PROMPT))
+      .addDialog(new TextPrompt(DATE_PROMPT,validDate))
       .addDialog(new DateResolverDialog(DATE_RESOLVER_DIALOG))
       .addDialog(
         new WaterfallDialog(WATERFALL_DIALOG, [
@@ -72,31 +76,6 @@ class claimDialog extends CancelAndHelpDialog {
   }
 
    async getDOB(stepContext) {
-    // return "hiii"
-    // console.log("auto init");  
-    // // var self=this;
-    //   console.log("returneddata",data);
-    //   console.log("returneddata",stepContext.options);
-    //   console.log("returneddata",stepContext.result);
-
-    // const bookingDetails = stepContext.options; 
-    // console.log("bookingDetails",bookingDetails);
-    // // Capture the results of the previous step
-    // // bookingDetails.claimPolicyNo = stepContext.result;
-    // if (!bookingDetails.claimDOB) {
-    //   console.log("skipping invalid claimDOB.....")
-    //   // const messageText = dob;
-    // const dob ="Hi " +data.name+ " could you please confirm your date of birth?";
-    //   const msg = MessageFactory.text(
-    //     dob,
-    //     dob,
-    //     InputHints.ExpectingInput
-    //   );
-
-    //   return  await stepContext.prompt(TEXT_PROMPT, { prompt: msg });
-    // }
-    // // return  stepContext.next(bookingDetails.claimDOB);
-    // });  
 
     
     const bookingDetails = stepContext.options; 
@@ -104,13 +83,10 @@ class claimDialog extends CancelAndHelpDialog {
     // Capture the results of the previous step
     bookingDetails.claimPolicyNo = stepContext.result;
     if (!bookingDetails.claimDOB) {
-      const messageText = dob;
-      const msg = MessageFactory.text(
-        messageText,
-        messageText,
-        InputHints.ExpectingInput
-      );
-      return await stepContext.prompt(TEXT_PROMPT, { prompt: msg });
+      const messageText = dob; 
+      const promptOptions = { prompt: dob, retryPrompt: "I'm sorry, for best results, please enter the date in MM/DD/YYYY." };
+ 
+      return await stepContext.prompt(DATE_PROMPT, promptOptions);
     }
 
     return await stepContext.next(bookingDetails.claimDOB);

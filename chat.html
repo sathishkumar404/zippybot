@@ -13,14 +13,95 @@
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
-		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>  
-		 <link href="https://cdn.botframework.com/botframework-webchat/latest/botchat.css" rel="stylesheet" />
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>   
+		    <script type="text/javascript"
+      src="https://unpkg.com/markdown-it/dist/markdown-it.min.js"></script>
+		 <link href="https://cdn.botframework.com/botframework-webchat/latest/botchat.css" rel="stylesheet" /> 
+		  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<style>	body,html{
+		<style>	body,html{  
 			height: 100%;
 			margin: 0;
 			background:transparent;
-		}
+		} 
+
+
+
+
+.transcript-timestamp{
+color:'#0464e0';
+}
+
+/***Right and Left Arrow ****/
+.css-gtdio3.css-ovmwp4.button{
+background-color:white !important;
+}
+/***user input box type*///
+
+/*.css-16qahhi.css-n2zczk.css-4ix4a1.css-1fe8kfc {
+right:500px !important;
+padding-left:500px !important;
+}*/
+/**Attach Button***/
+.css-1fwgtm8{
+background-color:white !important;
+}
+button{
+font-weight:bold !important;
+font-size:12px !important;
+/*
+background-color:#3EBDE0 !important;
+color:white !important;
+font-weight:bold !important;
+*/
+}
+/*chat box inside window*/
+.css-y1c0xs.css-ca0rlf {
+
+    width: 100% !important;
+    box-sizing: content-box !important;
+    padding-right:5px !important;
+    overflow-y: scroll !important;
+}
+/* button option color
+.css-282bx7{
+border-radius: 25px !important;  
+background-color:#25BCDF !important;
+
+}
+*/
+.content{
+font-size:13px;
+
+}
+.bubble {
+    align-items: center;
+    border-radius: 7.5px 25px !important;
+    padding:4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    min-width: 32px;
+    right: 2px;
+    width: fit-content;
+    background-color: red;
+    /*box-shadow: 1px 1px 1px #888888 !important;*/
+    /*box-shadow: 0 3px 3px rgba(0, 0, 0, .16), 0 1px 2px rgba(0, 0, 0, .23);*/
+}
+
+.css-1jkqi6q.from-user.bubble {
+width:Auto !important;
+
+position: relative !important;
+}
+.plain.css-o3xlyv{
+color:white;
+font-weight:bold;
+}
+.css-15m5x1b.button{
+font-weight:bold;
+background-color: red;
+}
 
 		.chat{
 			margin-top: auto;
@@ -28,7 +109,7 @@
 		}
 		.card{
 			top:10px;
-			height: 85%;
+			height: 87%;
 			border-radius: 15px !important;
 			background-color:#f1f1f1 !important;
 		}
@@ -249,7 +330,7 @@
 	<body>  
 			<div id="chat" style="position: absolute;
 			bottom: 20px;
-			right: 20px;
+			right: 10px;
 			width: 60px;
 			height: 60px;" onClick="chatRun()">
 			 
@@ -258,13 +339,13 @@
 			</div>
 		
 				
-				<div style=" top: 30px;
+				<div style=" 
 				right: 0px;
 				padding:10px;
 				bottom: 10px;
 				display: block;
 				float: right;
-				width:375px;
+				width:360px;
 				height:100%;
 				margin-right:10px;
 				display:none;" id="bot">
@@ -279,9 +360,7 @@
 									<span>Zippy Chat Bot</span>
 									<p>Dryden Insurance</p>
 								</div>
-								<div class="video_cam">
-									<span><i class="fas fa-phone"></i></span>
-								</div>
+								
 							</div>
 							<span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
 							<div class="action_menu">
@@ -313,12 +392,7 @@
 
 
 //start chatbot
-
-
-		//end
-		
-		
-		$(document).ready(function(){ 
+	$(document).ready(function(){ 
 			 $("#bot").hide()
 $('#action_menu_btn').click(function(){
 	$('.action_menu').toggle();
@@ -333,19 +407,40 @@ $('#end').click(function(){
 
 
 	}); 
-
-
+		//end
+		
+		
           //show chat header  
        function chatRun(){
 		  //show toggle 
 		
-		  $('#bot').toggle(); 
+		  $('#bot').toggle();  
+		  
+		  const styleOptions = {
+            bubbleBackground: 'rgba(245, 248, 250, 1)',
+            bubbleFromUserBackground: '#0464e0',
+	    botAvatarImage: 'https://cdn.getforge.com/jetzai.getforge.io/1569421717/support.png',
+
+	// doesn't seem to work
+    sendBoxButtonColor: '#767676', 
+    sendBoxButtonColorOnDisabled: '#CCC',
+    sendBoxButtonColorOnFocus: '#333',
+    sendBoxButtonColorOnHover: '#333',
+
+    // Suggested actions #4FD6AD
+    TextColor: 'black',
+   
+         };
+
 		
         window.WebChat.renderWebChat(
             {
                directLine: window.WebChat.createDirectLine({
-                  token: 'CCCrvonoUT0.o99Fgs3fkrZvybbd_IyBygeBuZY3TFaWA9r36gaiYH8'
+                  token: 'CCCrvonoUT0.o99Fgs3fkrZvybbd_IyBygeBuZY3TFaWA9r36gaiYH8',
+                  webSockets: true,
+        		  watermark: 10
                }),
+               styleOptions,
                sendTyping: true
             },
             document.getElementById('webchat'));
@@ -353,5 +448,58 @@ $('#end').click(function(){
 		 		   
 		}
 		
-	</script>
+	</script> 
+
+
+<!--
+<script>  
+
+
+	
+
+
+ function chatRun(){
+		  //show toggle  
+
+		var conversation =  localStorage.getItem('conversationId');  
+		console.log(conversation);  
+		
+
+		  $('#bot').toggle();   
+		var params = BotChat.queryParams(location.search);
+var my_token = params['my_token'];
+console.log(my_token);
+var botConnection = window.WebChat.createDirectLine({
+    token: 'CCCrvonoUT0.o99Fgs3fkrZvybbd_IyBygeBuZY3TFaWA9r36gaiYH8'
+});
+
+  window.WebChat.renderWebChat({
+    directLine: botConnection
+    ,user: { id: 'USER_ID', name: 'User' } 
+}, document.getElementById("webchat"));
+
+botConnection.connectionStatus$.subscribe(function (status) { 
+    if (status == 2) {  // wait for connection is 'OnLine' to send data to bot
+        var convID = botConnection.conversationId;  
+     localStorage.setItem('conversationId',convID);
+    console.log(convID);
+        botConnection.postActivity({
+            from: { id: convID }  // because first time user ID == conversation ID
+            ,type: 'event'
+            ,name: 'registerUserData'    // event name as we need
+            ,value: 'CCCrvonoUT0.o99Fgs3fkrZvybbd_IyBygeBuZY3TFaWA9r36gaiYH8'   // data attached to event
+        }).subscribe(function (activityId) {
+            // This subscription is a MUST
+            // If I remove this handler the postActivity not reaches the bot
+        });
+    }
+});
+
+
+
+		}
+
+
+    
+    </script> -->
 </html>

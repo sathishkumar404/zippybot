@@ -7,9 +7,25 @@
 const path = require('path');
 const restify = require('restify');
 var builder = require('botbuilder');  
+const { LuisRecognizer } = require('botbuilder-ai');
+require('dotenv').config();
+
+
+
 // Import required bot services. See https://aka.ms/bot-services to learn more about the different parts of a bot.
-const { BotFrameworkAdapter, MemoryStorage, ConversationState, UserState, BrowserSessionStorage } = require('botbuilder');
-// This bot's main dialog.
+const { BotFrameworkAdapter,BotStateSet,TurnContext, MemoryStorage, ConversationState, UserState, BrowserSessionStorage } = require('botbuilder');
+
+const {
+    DialogSet,
+    TextPrompt,
+    ChoicePrompt,
+    ConfirmPrompt,
+    DatetimePrompt,
+    FoundChoice,
+    FoundDatetime,
+    ListStyle
+} = require('botbuilder-dialogs');
+// This bot's main dialog. 
 const { RichCardsBot } = require('./bots/richCardsBot');
 const { MainDialog } = require('./dialogs/mainDialog');
 
@@ -60,11 +76,6 @@ const bot = new RichCardsBot(conversationState, userState, dialog);
 // Create HTTP server.
 const server = restify.createServer();  
 
-server.post({path: '/hello/:name'}, function(req, res, next) {
-    console.log(req.params);
-    res.send('<p>Olá</p>');
-});
-
 
 
 
@@ -84,6 +95,11 @@ server.post('/api/messages', (req, res) => {
     // Route received a request to adapter for processing
     adapter.processActivity(req, res, async (turnContext) => {
         // route to bot activity handler.
-        await bot.run(turnContext);
+        await bot.run(turnContext); 
+     
+
+
     });
 });
+ 
+

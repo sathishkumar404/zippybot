@@ -6,9 +6,8 @@ const { DateTimePrompt, WaterfallDialog } = require('botbuilder-dialogs');
 const { CancelAndHelpDialog } = require('./cancelAndHelpDialog');
 const { TimexProperty } = require('@microsoft/recognizers-text-data-types-timex-expression');
 
-const DATETIME_PROMPT = 'datetimePrompt';
+const EMAIL_PROMPT = 'Email_Prompt';
 const WATERFALL_DIALOG = 'waterfallDialog';
-
 const {basicText}   = require('../resources/basicText') 
 
 class DateResolverDialog extends CancelAndHelpDialog {
@@ -21,7 +20,6 @@ class DateResolverDialog extends CancelAndHelpDialog {
             ]));
 
         this.initialDialogId = WATERFALL_DIALOG;
-        console.log('cons');
     }
 
     async initialStep(stepContext) {
@@ -31,7 +29,7 @@ class DateResolverDialog extends CancelAndHelpDialog {
         const promptMessageText = 'When do you want your auto insurance coverages to begin?';
         const promptMessage = MessageFactory.text(promptMessageText, promptMessageText, InputHints.ExpectingInput);
 
-        const repromptMessageText = "I'm sorry, for best results, please enter the date in MM/DD/YYYY.";
+        const repromptMessageText = "I'm sorry, for best results, please enter the date in DD/MM/YYYY.";
         const repromptMessage = MessageFactory.text(repromptMessageText, repromptMessageText, InputHints.ExpectingInput);
 
         if (!timex) {
@@ -41,10 +39,11 @@ class DateResolverDialog extends CancelAndHelpDialog {
                     prompt: promptMessage,
                     retryPrompt: repromptMessage
                 });
-        } 
+        }
         // We have a Date we just need to check it is unambiguous.
         const timexProperty = new TimexProperty(timex);
-        if (!timexProperty.types.has('definite')) {
+        if (!timexProperty.types.has('definite')) { 
+            console.log('show retry');
             // This is essentially a "reprompt" of the data we were given up front.
             return await stepContext.prompt(DATETIME_PROMPT, { prompt: repromptMessage });
         }
@@ -59,7 +58,7 @@ class DateResolverDialog extends CancelAndHelpDialog {
 
     async dateTimePromptValidator(promptContext) { 
         console.log('datetimevalidator');
-        if (promptContext.recognized.succeeded) {
+        if (promptContext.recognized.succeeded) { 
             // This value will be a TIMEX. And we are only interested in a Date so grab the first result and drop the Time part.
             // TIMEX is a format that represents DateTime expressions that include some ambiguity. e.g. missing a Year.
             const timex = promptContext.recognized.value[0].timex.split('T')[0];
@@ -69,10 +68,7 @@ class DateResolverDialog extends CancelAndHelpDialog {
             return new TimexProperty(timex).types.has('definite');
         }
         return false;
-    } 
-
-
-   
+    }
 }
 
 module.exports.DateResolverDialog = DateResolverDialog;

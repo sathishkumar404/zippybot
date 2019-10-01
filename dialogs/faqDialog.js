@@ -46,7 +46,6 @@ class faqDialog extends CancelAndHelpDialog {
 
   async askQuestion(stepContext) {
     global.currentState = "FAQ";
-    console.log("get email  type");
     const bookingDetails = stepContext.options;
 
     bookingDetails.drivingExp = stepContext.result;

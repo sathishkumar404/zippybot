@@ -13,19 +13,21 @@ const {
 } = require("botbuilder");
 const {
   ConfirmPrompt,
-  TextPrompt,
+  TextPrompt, 
+  NumberPrompt,
   WaterfallDialog
 } = require("botbuilder-dialogs");
 const { CancelAndHelpDialog } = require("./cancelAndHelpDialog");
 const { DateResolverDialog } = require("./dateResolverDialog");
-
-const { capitalize } = require("../functions");
+const { confirmHome } = require("./confirmHome");
+const { capitalize,emailValid } = require("../functions");
 
 const { basicText } = require("../resources/basicText");
 const CONFIRM_PROMPT = "confirmPrompt";
 const DATE_RESOLVER_DIALOG = "dateResolverDialog";
 const TEXT_PROMPT = "textPrompt";
-const WATERFALL_DIALOG = "waterfallDialog";
+const WATERFALL_DIALOG = "waterfallDialog"; 
+const EMAIL_PROMPT = "emailPrompt"; 
 
 class autoDialog extends CancelAndHelpDialog {
   constructor(id) {
@@ -34,6 +36,7 @@ class autoDialog extends CancelAndHelpDialog {
 
     this.addDialog(new TextPrompt(TEXT_PROMPT))
       .addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
+      .addDialog(new TextPrompt(EMAIL_PROMPT,emailValid))
       .addDialog(new DateResolverDialog(DATE_RESOLVER_DIALOG))
       .addDialog(
         new WaterfallDialog(WATERFALL_DIALOG, [
@@ -45,20 +48,21 @@ class autoDialog extends CancelAndHelpDialog {
           this.getName.bind(this),
           this.quoteShow.bind(this),
           this.viewQuote.bind(this),
-          this.getEmail.bind(this),
+            this.getEmail.bind(this),
           this.finalStep1.bind(this)
         ])
-      );
+      ); 
 
     this.initialDialogId = WATERFALL_DIALOG;
-  }
+  } 
 
+   
+
+   
   async travelDateStep(stepContext) {
-    console.log("auto init");
+    console.log("auto init");  
+
     const bookingDetails = stepContext.options;
-
-    await stepContext.context.sendActivity(basicText.autoGreet);
-
     await stepContext.context.sendActivity(basicText.autoGreet2);
 
     // Capture the results of the previous step
@@ -177,31 +181,35 @@ class autoDialog extends CancelAndHelpDialog {
     const bookingDetails = stepContext.options;
     bookingDetails.Name = stepContext.result;
 
-    console.log(" quote show   step");   
 
     var quoteshow="Thanks, here are three plans we have for you.";
 
     await stepContext.context.sendActivity(quoteshow);
-         await stepContext.context.sendActivity({ attachments: [
+
+    await stepContext.context.sendActivity({ attachments: [
                     this.createThumbnailCard(),
                     this.createThumbnailCard1(),
                     this.createThumbnailCard2(),
-      ], attachmentLayout: AttachmentLayoutTypes.Carousel }); 
+      ], attachmentLayout: AttachmentLayoutTypes.Carousel });
 
+         
       return await stepContext.prompt(TEXT_PROMPT, { prompt: '' });
 
   
   } 
  
   async viewQuote(stepContext) {
-    console.log("final step");  
+    console.log("view quote step");  
 
-    const bookingDetails = stepContext.options;
+    const bookingDetails = stepContext.options; 
 
-    bookingDetails.quoteShow = stepContext.result.value;
+console.log(stepContext.result);
+console.log(stepContext.result.value);
+    bookingDetails.quoteShow = stepContext.result;  
+    console.log(bookingDetails.quoteShow);
+
     await stepContext.context.sendActivity('Give me a moment '+capitalize(bookingDetails.Name)+', Let me prepare a quick quote for you');
  
-
     await stepContext.context.sendActivity({
       attachments: [this.createReceiptCard(stepContext)]
     });
@@ -220,18 +228,19 @@ class autoDialog extends CancelAndHelpDialog {
         }
       ],
       [
-        {
-          type: "imBack",
-          title: "Select",
-          value: "Basic"
+        { 
+           "type": "imBack",
+    "title": "Select",
+     "value":"Basic"
         }
       ],
       {
-        subtitle: "",
+        subtitle: "Starts at: $35 a month",
         text:
-          "Covering six different kinds of coverage"
+          "(Includes 3 coverages required as per law in your state)"
       }
-    );
+    )
+
   } 
 
   createThumbnailCard1() {
@@ -251,9 +260,9 @@ class autoDialog extends CancelAndHelpDialog {
         }
       ],
       {
-        subtitle: "",
+        subtitle: "Starts at: $47 a month",
         text:
-          "Coveragefor the unique needs of vintage and classic car collectors"
+          "(Includes Basic + 2 additional Coverages) \n\n"
       }
     );
   } 
@@ -274,10 +283,10 @@ class autoDialog extends CancelAndHelpDialog {
         }
       ],
       {
-        subtitle: "",
+        subtitle: "Starts at: $69 a month",
         text:
-          "Covering more than six kinds of coverages"
-      }
+          "(Includes Basic + 5 additional coverages & Free additional drivers)"
+      } 
     );
   }
 
@@ -287,15 +296,12 @@ class autoDialog extends CancelAndHelpDialog {
     const bookingDetails = stepContext.options; 
 
     if (!bookingDetails.Email) {
-      const messageText = basicText.askEmail;
-      const msg = MessageFactory.text(
-        messageText,
-        messageText,
-        InputHints.ExpectingInput
-      );
-      return await stepContext.prompt(TEXT_PROMPT, { prompt: msg });
+      const messageText = basicText.askEmail; 
+    
+      const promptOptions = { prompt: basicText.askEmail, retryPrompt: basicText.retryEmailPrompt };
+ 
+      return await stepContext.prompt(EMAIL_PROMPT, promptOptions);
     }
-
     return await stepContext.next(bookingDetails.Email);
   }  
 
@@ -315,8 +321,14 @@ class autoDialog extends CancelAndHelpDialog {
  
   createReceiptCard(stepContext) {
     const bookingDetails = stepContext.options;
-
     var name = bookingDetails.Name;
+    var quote = bookingDetails.quoteShow;   
+    if(quote == "Basic") 
+    var list = basicText.Basic;
+  else if(quote == "Classic")
+    var list = basicText.Classic;
+  else if(quote == "Recommended")
+    var list = basicText.Recommended;
     return CardFactory.receiptCard({
       title: capitalize(name),  
       facts: [
@@ -329,24 +341,7 @@ class autoDialog extends CancelAndHelpDialog {
           value: ""
         }
       ],
-      items: [
-        {
-          title: "Property Damage",
-          price: "$10.00"
-        },
-        {
-          title: "Medical Payments",
-          price: "$10.00",
-        },
-        {
-          title: "UM-Bodily Injury",
-          price: "$10.00",
-        },
-        {
-          title:"UM-Physical Damage",
-          price:"$10.00"
-        }
-      ],
+      items: list ,
       tax: "$7.50",
       total: "$47.50"
     });
@@ -365,7 +360,7 @@ class autoDialog extends CancelAndHelpDialog {
         messageText,
         InputHints.ExpectingInput
       );
-      return await stepContext.prompt(TEXT_PROMPT, { prompt: msg });
+      return await stepContext.prompt(NUMBER_PROMPT, { prompt: msg });
     }
 
     return await stepContext.next(bookingDetails.phone);
